@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Automate",
+    "slug": "My-part",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/AutoMateFinal.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "Automate",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/AutoMateFinal.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.nands.automate"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c98c634b-7f51-4848-a6e7-4b32f2dafae7"
+      }
+    }
+  }
+}
