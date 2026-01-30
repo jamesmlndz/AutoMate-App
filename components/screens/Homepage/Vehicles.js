@@ -6,12 +6,16 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  StatusBar,
+  Platform,
+  Dimensions
 } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-// import styles from "../../AllStyles/ServicesStyles"; // NOTE: Original external styles are commented out.
 import VehicleCard from "../../VehicleCard";
 import { useGetUserVehicles } from "../../../hooks/useVehicle.query";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const Vehicles = () => {
   const navigation = useNavigation();
@@ -19,63 +23,83 @@ const Vehicles = () => {
 
   const vehicleData = data?.data || [];
 
-  // --- UI Conditional Rendering ---
-
   if (isLoading) {
     return (
-      <View style={[localStyles.container, localStyles.centerMessage]}>
-        <ActivityIndicator size="large" color="#0B2B66" />
-        <Text style={localStyles.messageText}>Loading your vehicle list...</Text>
+      <View style={localStyles.centerMessage}>
+        <ActivityIndicator size="large" color="#0A2146" />
+        <Text style={localStyles.messageText}>Fetching your garage...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={[localStyles.container, localStyles.centerMessage]}>
-        <AntDesign name="exclamationcircleo" size={30} color="#E04C4C" />
+      <View style={localStyles.centerMessage}>
+        <MaterialIcons name="cloud-off" size={50} color="#E04C4C" />
         <Text style={[localStyles.messageText, { color: '#E04C4C' }]}>
-          Error loading vehicles. Please check your connection.
+          We couldn't reach your vehicles.
         </Text>
       </View>
     );
   }
 
+  const ListHeader = () => (
+    <View style={localStyles.listHeaderContainer}>
+      <Text style={localStyles.listTitle}>Registered Vehicles</Text>
+      <View style={localStyles.badge}>
+        <Text style={localStyles.badgeText}>{vehicleData.length}</Text>
+      </View>
+    </View>
+  );
+
   const ListEmptyComponent = () => (
-    <View style={localStyles.emptyState}>
-      <Ionicons name="car-sport-outline" size={70} color="#BBBBBB" />
-      <Text style={localStyles.emptyTitle}>No Vehicles Registered</Text>
+    <View style={localStyles.emptyStateCard}>
+      <View style={localStyles.emptyIconCircle}>
+        <FontAwesome5 name="car-alt" size={40} color="#274B88" />
+      </View>
+      <Text style={localStyles.emptyTitle}>Your Garage is Empty</Text>
       <Text style={localStyles.emptySubtitle}>
-        Your registered vehicles will appear here for easy management.
+        Once you add vehicles to your profile, they will appear here for quick booking.
       </Text>
     </View>
   );
-  
-  // NOTE: The AddVehicleButton component has been entirely removed as requested.
 
   return (
     <View style={localStyles.container}>
-      {/* ===== HEADER (Enhanced Styling) ===== */}
-      <View style={localStyles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <AntDesign
-            name="arrowleft"
-            size={24}
-            color="white"
-            style={localStyles.backIcon}
-          />
-        </TouchableOpacity>
-        <Text style={localStyles.headerText}>MY VEHICLES</Text>
-        {/* Placeholder to keep the title centered */}
-        <View style={{ width: 34 }} /> 
+      <StatusBar barStyle="light-content" />
+
+      {/* ===== HEADER SECTION ===== */}
+      <View style={localStyles.topSection}>
+        <View style={localStyles.headerActions}>
+          {/* Matched back button from Profile screen */}
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()}
+            style={localStyles.backButton}
+          >
+            <MaterialIcons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          
+          <Text style={localStyles.headerTitle}>AutoMate Garage</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        
+        <View style={localStyles.headerInfo}>
+          <Text style={localStyles.greeting}>Manage your fleet</Text>
+          <Text style={localStyles.subGreeting}>View and select your registered vehicles below.</Text>
+        </View>
       </View>
 
-      {/* ===== VEHICLE LIST (Improved Layout) ===== */}
+      {/* ===== VEHICLE LIST ===== */}
       <FlatList
         data={vehicleData}
         keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => <VehicleCard vehicle={item} />}
-        contentContainerStyle={localStyles.gridContainer}
+        renderItem={({ item }) => (
+          <View style={localStyles.cardContainer}>
+            <VehicleCard vehicle={item} />
+          </View>
+        )}
+        ListHeaderComponent={vehicleData.length > 0 ? ListHeader : null}
+        contentContainerStyle={localStyles.listPadding}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={ListEmptyComponent}
       />
@@ -85,82 +109,131 @@ const Vehicles = () => {
 
 export default Vehicles;
 
-// --- 🎨 START OF LOCAL STYLES (Enhanced UI - CSS at the bottom) ---
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F6F8FC", // Light background for content area
+    backgroundColor: "#F6F8FC",
   },
-  header: {
+  topSection: {
+    backgroundColor: "#0A2146",
+    paddingTop: Platform.OS === "ios" ? 55 : 40,
+    paddingHorizontal: 25,
+    paddingBottom: 35,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  headerActions: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#0B2B66", // Deep Blue color
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    elevation: 4, // Android shadow
-    shadowColor: "#000", // iOS shadow
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    alignItems: "center",
   },
-  headerText: {
+  // Replaced iconButton with backButton style from ProfileScreen
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
     color: "white",
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: "Poppins-Bold",
     letterSpacing: 0.5,
   },
-  backIcon: {
-    padding: 5,
+  headerInfo: {
+    marginTop: 25,
   },
-  gridContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 20,
+  greeting: {
+    color: "white",
+    fontSize: 24,
+    fontFamily: "Poppins-Bold",
   },
-  // Removed addButton and addButtonText styles
-
-  // --- Loading, Error, and Empty State Styles ---
+  subGreeting: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    marginTop: 4,
+  },
+  listPadding: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    paddingTop: 25,
+  },
+  listHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    marginLeft: 5,
+  },
+  listTitle: {
+    fontSize: 16,
+    fontFamily: "Poppins-Bold",
+    color: "#0A2146",
+  },
+  badge: {
+    backgroundColor: "#274B88",
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 10,
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 12,
+    fontFamily: "Poppins-Bold",
+  },
+  cardContainer: {
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
   centerMessage: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 30,
-    backgroundColor: "#F6F8FC",
+    backgroundColor: '#F6F8FC',
   },
   messageText: {
     fontSize: 16,
-    fontFamily: "Poppins-Regular",
-    color: "#555",
-    textAlign: "center",
-    marginTop: 10,
+    fontFamily: "Poppins-Medium",
+    color: "#0A2146",
+    marginTop: 15,
   },
-  emptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 30,
-    minHeight: 250,
+  emptyStateCard: {
     backgroundColor: 'white',
-    borderRadius: 16,
-    marginTop: 20,
-    marginHorizontal: 10,
+    borderRadius: 25,
+    padding: 40,
+    alignItems: 'center',
+    marginTop: 40,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#E1E7F0',
+  },
+  emptyIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#F0F4FA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   emptyTitle: {
     fontSize: 18,
     fontFamily: "Poppins-Bold",
-    color: "#0B2B66",
-    marginTop: 15,
+    color: "#0A2146",
+    textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 14,
     fontFamily: "Poppins-Regular",
-    color: "#888",
+    color: "#666",
     textAlign: "center",
-    marginTop: 5,
+    marginTop: 10,
+    lineHeight: 22,
   },
 });
-// --- 🎨 END OF LOCAL STYLES ---
