@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
   },
   backButton: {
     padding: 8, // Exact padding from TrackingProgress
