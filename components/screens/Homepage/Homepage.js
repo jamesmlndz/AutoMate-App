@@ -385,54 +385,82 @@ const Homepage = () => {
           </View>
         </View>
 
-        {/* ===== CUSTOMER STORIES (NO CHANGE) ===== */}
+        {/* =====  CUSTOMER STORIES ===== */}
         <View style={[styles.sectionWrap, { backgroundColor: theme.background, marginTop: 0 }]}>
-          <Text style={[styles.sectionTitle, { color: theme.text, marginLeft: 0 }]}>
-            What Our Customers Say
-          </Text>
-          <Text style={[styles.sectionSubtitle, { color: theme.subtext }]}>
-            Real experiences from our satisfied clients
-          </Text>
+          <View style={styles.categoryHeader}>
+            <View>
+              <Text style={[styles.sectionTitle, { color: theme.text, marginLeft: 0 }]}>
+                What Our Customers Say
+              </Text>
+              <Text style={[enhancedStyles.reviewSubtitle, { color: isDarkMode ? "#B0B0B0" : "#64748B" }]}>
+                {customerStories.length}+ satisfied clients
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => navigation.navigate("AllReviewsScreen")}>
+               <Text style={[styles.viewAll, { color: theme.accentBlue }]}>View All</Text>
+            </TouchableOpacity>
+          </View>
 
           <ScrollView
             horizontal={!expanded}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={[
-              styles.scrollContainer,
-              expanded && styles.expandedScroll,
+              enhancedStyles.storyScrollContainer,
+              expanded && enhancedStyles.expandedGrid,
             ]}
           >
             {visibleStories.map((s, i) => (
               <View
                 key={i}
                 style={[
-                  styles.storyCard,
-                  expanded && styles.storyCardExpanded,
+                  enhancedStyles.modernStoryCard,
+                  expanded && enhancedStyles.modernStoryCardExpanded,
                   { backgroundColor: theme.card, borderColor: theme.border },
                 ]}
               >
-                <Image source={s.img} style={styles.storyImage} />
-                <View style={[styles.storyContent, { backgroundColor: theme.card }]}>
-                  <Text style={[styles.storyName, { color: theme.text }]}>
-                    {s.name}
-                  </Text>
-                  <Text style={[styles.storyReview, { color: theme.subtext }]}>
+                {/* Header: Avatar & Name */}
+                <View style={enhancedStyles.storyHeader}>
+                  <Image source={s.img} style={enhancedStyles.userAvatar} />
+                  <View style={enhancedStyles.userInfo}>
+                    <Text style={[enhancedStyles.userNameText, { color: theme.text }]} numberOfLines={1}>
+                      {s.name}
+                    </Text>
+                    <View style={enhancedStyles.ratingRow}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FontAwesome key={star} name="star" size={10} color="#FFD700" />
+                      ))}
+                    </View>
+                  </View>
+                </View>
+
+                {/* Body: Review Text */}
+                <View style={enhancedStyles.reviewBody}>
+                  <Text style={[enhancedStyles.reviewText, { color: isDarkMode ? "#E0E0E0" : "#4A5568" }]} numberOfLines={3}>
                     “{s.review}”
                   </Text>
+                </View>
+
+                <View style={[enhancedStyles.timeBadge, { backgroundColor: isDarkMode ? "#2D2D2D" : "#F1F5F9" }]}>
+                   <Text style={[enhancedStyles.timeText, { color: isDarkMode ? "#B0B0B0" : "#64748B" }]}>Recently</Text>
                 </View>
               </View>
             ))}
           </ScrollView>
 
-          {/* See All Button */}
+          {/* Toggle Expand Button (Nicely Styled) */}
           <TouchableOpacity
             activeOpacity={0.8}
-            style={[styles.viewAllBtn, { backgroundColor: theme.headerBg }]}
-            onPress={() => navigation.navigate("AllReviewsScreen")} // ✅ Navigate to AllReviewsScreen
+            style={[enhancedStyles.expandToggle, { borderColor: theme.accentBlue }]}
+            onPress={toggleExpand}
           >
-            <Text style={styles.viewAllText}>
-              See All
+            <Text style={[enhancedStyles.expandToggleText, { color: theme.accentBlue }]}>
+              {expanded ? "Show Less" : "Quick View All"}
             </Text>
+            <Ionicons 
+              name={expanded ? "chevron-up" : "chevron-down"} 
+              size={16} 
+              color={theme.accentBlue} 
+            />
           </TouchableOpacity>
         </View>
 
@@ -1123,5 +1151,111 @@ const enhancedStyles = StyleSheet.create({
       fontFamily: "Poppins-Regular",
       fontSize: 12,
       marginTop: 10,
-  }
+  }, 
+  // ** ENHANCED CUSTOMER STORIES **
+  storyScrollContainer: {
+    paddingVertical: 10,
+    paddingLeft: 5,
+  },
+  reviewSubtitle: {
+    fontSize: 13,
+    fontFamily: "Poppins-Regular",
+    marginTop: -8,
+    marginBottom: 15,
+  },
+  modernStoryCard: {
+    width: SCREEN_WIDTH * 0.75,
+    borderRadius: 20,
+    padding: 16,
+    marginRight: 15,
+    borderWidth: 1,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  modernStoryCardExpanded: {
+    width: '100%',
+    marginRight: 0,
+    marginBottom: 12,
+  },
+  expandedGrid: {
+    paddingHorizontal: 0,
+  },
+  storyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  userAvatar: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+  },
+  userInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  userNameText: {
+    fontSize: 15,
+    fontFamily: "Poppins-Bold",
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+    backgroundColor: 'rgba(36, 80, 151, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  verifiedText: {
+    fontSize: 8,
+    fontFamily: "Poppins-Bold",
+    marginLeft: 2,
+    textTransform: 'uppercase',
+  },
+  reviewBody: {
+    marginTop: 2,
+  },
+  reviewText: {
+    fontSize: 13,
+    fontFamily: "Poppins-Italic",
+    lineHeight: 20,
+  },
+  timeBadge: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  timeText: {
+    fontSize: 10,
+    fontFamily: "Poppins-Medium",
+  },
+  expandToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderRadius: 12,
+    borderStyle: 'dashed',
+    gap: 8,
+  },
+  expandToggleText: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 14,
+  },
 });
